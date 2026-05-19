@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './InputForm.css';
 
+// Chave da API chumbada para uso automático
+const FIXED_API_KEY = '83aa63a8ca56c3bb44dcf13023dd3a20';
+
 const InputForm = ({ onAnalysisComplete }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [isKeyIntegrated, setIsKeyIntegrated] = useState(false);
-  
   const [teamA, setTeamA] = useState('');
   const [teamB, setTeamB] = useState('');
   const [date, setDate] = useState('');
@@ -22,15 +22,6 @@ const InputForm = ({ onAnalysisComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Tenta pegar a chave do .env primeiro, depois do localStorage
-    const savedKey = import.meta.env.VITE_API_KEY || localStorage.getItem('api_football_key');
-    if (savedKey && savedKey.trim() !== '') {
-      setApiKey(savedKey);
-      setIsKeyIntegrated(true);
-    }
-  }, []);
-
   const handleOddsChange = (e) => {
     const { name, value } = e.target;
     setOdds(prev => ({ ...prev, [name]: value }));
@@ -38,31 +29,20 @@ const InputForm = ({ onAnalysisComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!apiKey) {
-      setError('A Chave da API é obrigatória. Por favor, configure o arquivo .env ou insira abaixo.');
-      return;
-    }
-    
-    if (!isKeyIntegrated) {
-      localStorage.setItem('api_football_key', apiKey);
-      setIsKeyIntegrated(true);
-    }
-    
     setLoading(true);
     setError(null);
 
     try {
-      // Import dynamic to avoid top-level issues if not needed yet
       const { validateAndFetchTeams, getTeamLast10 } = await import('../services/apiFootball.js');
       const { runAnalysis } = await import('../services/analysisEngine.js');
 
       // 1. Validar e buscar times
-      const { teamA: tA, teamB: tB } = await validateAndFetchTeams(apiKey, teamA, teamB);
+      const { teamA: tA, teamB: tB } = await validateAndFetchTeams(FIXED_API_KEY, teamA, teamB);
 
       // 2. Buscar últimos 10 jogos de cada time
       const [last10A, last10B] = await Promise.all([
-        getTeamLast10(apiKey, tA.id),
-        getTeamLast10(apiKey, tB.id)
+        getTeamLast10(FIXED_API_KEY, tA.id),
+        getTeamLast10(FIXED_API_KEY, tB.id)
       ]);
 
       if (!last10A || last10A.length === 0 || !last10B || last10B.length === 0) {
@@ -101,20 +81,6 @@ const InputForm = ({ onAnalysisComplete }) => {
       {error && <div className="error-alert">{error}</div>}
       
       <form onSubmit={handleSubmit} className="analysis-form">
-        {!isKeyIntegrated && (
-          <div className="form-group">
-            <label>API Key (API-Football)</label>
-            <input 
-              type="password" 
-              value={apiKey} 
-              onChange={(e) => setApiKey(e.target.value)} 
-              placeholder="Insira sua chave da API"
-              required={!isKeyIntegrated} 
-            />
-            <small>Sua chave será salva localmente no navegador.</small>
-          </div>
-        )}
-
         <div className="form-row">
           <div className="form-group">
             <label>Time Mandante (A)</label>
@@ -162,16 +128,16 @@ const InputForm = ({ onAnalysisComplete }) => {
             <input type="number" step="0.01" name="under25" value={odds.under25} onChange={handleOddsChange} />
           </div>
           <div className="form-group">
-            <label>Ambas Marcam (Sim)</label>
+            <label>Ambas Marcam</label>
             <input type="number" step="0.01" name="bttsYes" value={odds.bttsYes} onChange={handleOddsChange} />
           </div>
           
           <div className="form-group">
-            <label>Over 8.5 Escanteios</label>
+            <label>Mais de 8.5 Escanteios</label>
             <input type="number" step="0.01" name="cornersOver85" value={odds.cornersOver85} onChange={handleOddsChange} />
           </div>
           <div className="form-group">
-            <label>Over 3.5 Cartões</label>
+            <label>Mais de 3.5 Cartões</label>
             <input type="number" step="0.01" name="cardsOver35" value={odds.cardsOver35} onChange={handleOddsChange} />
           </div>
         </div>
