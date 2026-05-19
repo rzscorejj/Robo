@@ -1,4 +1,4 @@
-const API_BASE = 'https://v3.football.api-sports.io';
+const API_BASE = '/api';
 
 const fetchApi = async (endpoint, apiKey) => {
   const response = await fetch(`${API_BASE}${endpoint}`, {
