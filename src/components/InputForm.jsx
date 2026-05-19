@@ -9,7 +9,7 @@ const InputForm = ({ onAnalysisComplete }) => {
   const [teamB, setTeamB] = useState('');
   const [date, setDate] = useState('');
   const [league, setLeague] = useState('');
-  const [sofascoreLink, setSofascoreLink] = useState('');
+  const [sofascoreLink, setSofascoreLink] = useState('https://www.sofascore.com/pt');
   const [odds, setOdds] = useState({
     home: '',
     draw: '',
