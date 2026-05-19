@@ -1,0 +1,100 @@
+.market-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid var(--border-color);
+  background: var(--surface-color);
+}
+
+.card-high {
+  border-left-color: var(--success);
+}
+.card-medium {
+  border-left-color: var(--warning);
+}
+.card-low {
+  border-left-color: var(--danger);
+}
+
+.market-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.market-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.market-header h4 {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.confidence-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.card-high .confidence-badge {
+  background-color: var(--success-bg);
+  color: var(--success);
+}
+
+.card-medium .confidence-badge {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+.card-low .confidence-badge {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+.market-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Barra de progressão estilo Sofascore */
+.trend-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 120px;
+  justify-content: flex-end;
+}
+
+.trend-bar-wrapper {
+  width: 60px;
+  height: 6px;
+  background: var(--bg-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.trend-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.card-high .trend-bar-fill { background: var(--success); }
+.card-medium .trend-bar-fill { background: var(--warning); }
+.card-low .trend-bar-fill { background: var(--danger); }
+
+.trend-value {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  min-width: 40px;
+  text-align: right;
+}

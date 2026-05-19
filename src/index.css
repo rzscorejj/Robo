@@ -1,0 +1,118 @@
+:root {
+  --bg-color: #0b111e;
+  --surface-color: #151e2d;
+  --surface-hover: #1e293b;
+  --border-color: #233045;
+  --text-primary: #ffffff;
+  --text-secondary: #8b98ac;
+  
+  --primary: #3772ff;
+  --primary-hover: #295bcc;
+  
+  --success: #00d563;
+  --success-bg: rgba(0, 213, 99, 0.15);
+  --warning: #ffb800;
+  --warning-bg: rgba(255, 184, 0, 0.15);
+  --danger: #ff4747;
+  --danger-bg: rgba(255, 71, 71, 0.15);
+  
+  --radius: 8px;
+  --transition: 0.2s ease-in-out;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.app-header {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  color: var(--primary);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.app-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Flat Cards (Sofascore Style) */
+.glass {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+}
+
+.glass-card {
+  padding: 1.25rem;
+  transition: background var(--transition);
+}
+
+.glass-card:hover {
+  background: var(--surface-hover);
+}
+
+/* Base Form Elements */
+input, select, button {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #0f1725;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  transition: border-color var(--transition);
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+button {
+  cursor: pointer;
+  padding: 0.85rem 1.5rem;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+button:active {
+  transform: scale(0.98);
+}
