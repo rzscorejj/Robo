@@ -1,166 +1,232 @@
-.dashboard-container {
-  padding: 0 1rem 3rem;
-  max-width: 900px;
+.dashboard-pro {
+  padding: 0 1rem 4rem;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-.back-btn {
+.back-btn-pro {
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  font-size: 0.85rem;
+}
+
+.back-btn-pro:hover {
   background: transparent;
   color: var(--primary);
-  padding: 0.5rem 0;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  text-transform: none;
+  box-shadow: none;
 }
 
-.back-btn:hover {
-  background: transparent;
-  color: var(--primary-hover);
-  transform: none;
-}
-
-/* Header / Placar Sofascore */
-.match-header {
-  padding: 2rem;
-  margin-bottom: 2rem;
+.match-header-pro {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: var(--radius);
+  margin-bottom: 3rem;
 }
 
-.match-teams {
+.match-meta-top {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.league-badge, .date-badge {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--border-color);
+}
+
+.teams-display-pro {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
+  gap: 3rem;
   width: 100%;
 }
 
-.team-info {
+.team-pro {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   flex: 1;
 }
 
-.team-logo {
-  width: 60px;
-  height: 60px;
+.team-logo-pro {
+  width: 80px;
+  height: 80px;
   object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
 }
 
-.team-name {
-  font-size: 1.1rem;
-  font-weight: 600;
+.logo-placeholder {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.team-name-pro {
+  font-size: 1.3rem;
+  font-weight: 700;
   color: var(--text-primary);
   text-align: center;
 }
 
-.vs {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-secondary);
+.vs-pro {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--secondary);
+  opacity: 0.7;
 }
 
-.match-meta {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.highlight-report {
+  padding: 2rem;
+  margin-bottom: 3rem;
+  border: 1px solid rgba(0, 213, 99, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
-.main-report {
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+.highlight-report::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 4px; height: 100%;
+  background: var(--success);
 }
 
-.section-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.highlight-badge {
+  display: inline-block;
+  background: var(--success-bg);
+  color: var(--success);
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.report-grid {
+.highlight-content h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.ev-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
-.report-item {
+.ev-stat-box {
+  background: rgba(0,0,0,0.3);
+  padding: 1rem;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  background: var(--bg-color);
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
+  gap: 0.5rem;
 }
 
-.report-item.highlight {
-  background: rgba(55, 114, 255, 0.1);
-  border-color: rgba(55, 114, 255, 0.3);
-}
-
-.report-item .label {
+.ev-stat-box span {
   font-size: 0.8rem;
   color: var(--text-secondary);
-  margin-bottom: 0.25rem;
   text-transform: uppercase;
 }
 
-.report-item .value {
-  font-size: 1.2rem;
-  font-weight: 700;
+.ev-stat-box strong {
+  font-size: 1.5rem;
+  color: var(--text-primary);
 }
 
-.report-details {
+.highlight-odd strong {
+  color: var(--warning);
+}
+
+.ev-stat-box.success {
+  background: rgba(0, 213, 99, 0.1);
+  border: 1px solid rgba(0, 213, 99, 0.2);
+}
+
+.ev-stat-box.success strong {
+  color: var(--success);
+}
+
+.stake-recommendation {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.stake-recommendation strong {
+  color: var(--text-primary);
+}
+
+.stats-grid-pro {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #fff, var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-title-pro {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.markets-grid-pro {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 1rem;
 }
 
-.detail-box {
-  padding: 1rem;
-  background: var(--bg-color);
-  border-radius: 6px;
-  border-left: 4px solid var(--primary);
-}
-
-.detail-box h4 {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
+.no-data {
   color: var(--text-secondary);
-}
-
-.detail-box p {
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.warning-box {
-  border-left-color: var(--warning);
-}
-
-.action-box {
-  border-left-color: var(--success);
-  background: var(--success-bg);
-}
-
-.recommendation-text {
-  font-size: 1.25rem !important;
-  font-weight: 700;
-  color: var(--success) !important;
-}
-
-.markets-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
 }

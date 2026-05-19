@@ -1,134 +1,236 @@
-export const runAnalysis = (teamsData, last10A, last10B, odds) => {
-  const calcTrends = (fixtures) => {
-    let over15 = 0;
-    let over25 = 0;
-    let btts = 0;
-    let goalsScored = 0;
-    let goalsConceded = 0;
+// Motor Estatístico Quantitativo Premium
+
+const calculateAverages = (fixtures) => {
+  let goalsFor = 0;
+  let goalsAgainst = 0;
+  let cornersFor = 0;
+  let cornersAgainst = 0;
+  let cardsFor = 0;
+  let cardsAgainst = 0;
+
+  if (!fixtures || fixtures.length === 0) return { goalsFor: 0, goalsAgainst: 0, cornersFor: 0, cornersAgainst: 0, cardsFor: 0, cardsAgainst: 0 };
+
+  fixtures.forEach(item => {
+    const isHome = item.teams?.home?.id === item.teamId; // We need to pass teamId context or infer it
+    // Actually, we can just sum all goals in the fixture if we are measuring "Match Over/Under"
+    // But for team-specific metrics, we need to know which team it is.
+  });
+
+  return {}; // Placeholder for complex logic below
+};
+
+// Nova abordagem mais limpa
+const extractTeamStats = (fixtures, teamId) => {
+  let gf = 0, ga = 0, cornersFor = 0, cornersAgainst = 0, cardsFor = 0, cardsAgainst = 0;
+  let over05ht = 0, over15 = 0, over25 = 0, btts = 0;
+  let cornersTotal = [], cardsTotal = [];
+  let wins = 0, draws = 0, losses = 0;
+
+  if (!fixtures || fixtures.length === 0) return null;
+
+  fixtures.forEach(item => {
+    const f = item.fixture;
+    const isHome = item.teams.home.id === teamId;
+    const teamStats = isHome ? item.teams.home : item.teams.away;
+    const oppStats = isHome ? item.teams.away : item.teams.home;
+    const scoreHome = item.goals.home;
+    const scoreAway = item.goals.away;
     
-    let totalCorners = 0;
-    let totalCards = 0;
-    let gamesWithCorners = 0;
-    let gamesWithCards = 0;
+    const scoreFor = isHome ? scoreHome : scoreAway;
+    const scoreAgainst = isHome ? scoreAway : scoreHome;
 
-    fixtures.forEach(f => {
-      const homeGoals = f.goals.home || 0;
-      const awayGoals = f.goals.away || 0;
-      const totalGoals = homeGoals + awayGoals;
+    gf += scoreFor;
+    ga += scoreAgainst;
 
-      if (totalGoals > 1.5) over15++;
-      if (totalGoals > 2.5) over25++;
-      if (homeGoals > 0 && awayGoals > 0) btts++;
+    if (scoreFor > scoreAgainst) wins++;
+    else if (scoreFor === scoreAgainst) draws++;
+    else losses++;
 
-      if (f.teams.home.id === fixtures[0]?.teams?.home?.id || f.teams.home.id === fixtures[0]?.teams?.away?.id) {
-         goalsScored += (f.teams.home.name === fixtures[0].teams.home.name) ? homeGoals : awayGoals;
-         goalsConceded += (f.teams.home.name === fixtures[0].teams.home.name) ? awayGoals : homeGoals;
+    const totalGoals = scoreHome + scoreAway;
+    const htGoals = item.score.halftime.home + item.score.halftime.away;
+
+    if (htGoals > 0) over05ht++;
+    if (totalGoals > 1) over15++;
+    if (totalGoals > 2) over25++;
+    if (scoreHome > 0 && scoreAway > 0) btts++;
+
+    // Statistics might be null if not fetched or API free tier empty
+    let matchCornersFor = 0, matchCornersAgainst = 0;
+    let matchCardsFor = 0, matchCardsAgainst = 0;
+
+    if (item.statistics && item.statistics.length === 2) {
+      const myStats = item.statistics.find(s => s.team.id === teamId);
+      const theirStats = item.statistics.find(s => s.team.id !== teamId);
+
+      if (myStats && theirStats) {
+        const getStat = (arr, type) => {
+          const s = arr.statistics.find(x => x.type === type);
+          return s && s.value ? parseInt(s.value) : 0;
+        };
+        matchCornersFor = getStat(myStats, 'Corner Kicks');
+        matchCornersAgainst = getStat(theirStats, 'Corner Kicks');
+        matchCardsFor = getStat(myStats, 'Yellow Cards') + getStat(myStats, 'Red Cards');
+        matchCardsAgainst = getStat(theirStats, 'Yellow Cards') + getStat(theirStats, 'Red Cards');
       }
+    } else {
+      // Falback básico se não houver stats
+      matchCornersFor = 4; matchCornersAgainst = 4;
+      matchCardsFor = 2; matchCardsAgainst = 2;
+    }
 
-      // Processar estatísticas (escanteios e cartões) se disponíveis
-      if (f.statistics && f.statistics.length > 0) {
-        let matchCorners = 0;
-        let matchCards = 0;
-        
-        f.statistics.forEach(teamStat => {
-          if (!teamStat.statistics) return;
-          const cornerStat = teamStat.statistics.find(s => s.type === 'Corner Kicks');
-          const yellowStat = teamStat.statistics.find(s => s.type === 'Yellow Cards');
-          const redStat = teamStat.statistics.find(s => s.type === 'Red Cards');
-          
-          if (cornerStat && cornerStat.value) matchCorners += parseInt(cornerStat.value);
-          if (yellowStat && yellowStat.value) matchCards += parseInt(yellowStat.value);
-          if (redStat && redStat.value) matchCards += parseInt(redStat.value);
-        });
+    cornersFor += matchCornersFor;
+    cornersAgainst += matchCornersAgainst;
+    cardsFor += matchCardsFor;
+    cardsAgainst += matchCardsAgainst;
 
-        if (matchCorners > 0) {
-          totalCorners += matchCorners;
-          if (matchCorners > 8.5) gamesWithCorners++; // Acima de 8.5
-        }
-        if (matchCards > 0) {
-          totalCards += matchCards;
-          if (matchCards > 3.5) gamesWithCards++; // Acima de 3.5
-        }
-      }
-    });
+    cornersTotal.push(matchCornersFor + matchCornersAgainst);
+    cardsTotal.push(matchCardsFor + matchCardsAgainst);
+  });
 
-    return {
-      over15Pct: (over15 / fixtures.length) * 100,
-      over25Pct: (over25 / fixtures.length) * 100,
-      bttsPct: (btts / fixtures.length) * 100,
-      cornersOver85Pct: (gamesWithCorners / fixtures.length) * 100,
-      cardsOver35Pct: (gamesWithCards / fixtures.length) * 100,
-      avgScored: goalsScored / fixtures.length,
-      avgConceded: goalsConceded / fixtures.length
-    };
-  };
-
-  const statsA = calcTrends(last10A);
-  const statsB = calcTrends(last10B);
-
-  // Média combinada para o jogo
-  const combinedOver15 = (statsA.over15Pct + statsB.over15Pct) / 2;
-  const combinedOver25 = (statsA.over25Pct + statsB.over25Pct) / 2;
-  const combinedBtts = (statsA.bttsPct + statsB.bttsPct) / 2;
-  const combinedCorners = (statsA.cornersOver85Pct + statsB.cornersOver85Pct) / 2;
-  const combinedCards = (statsA.cardsOver35Pct + statsB.cardsOver35Pct) / 2;
-
-  // Analisar valor baseado na Odd inserida
-  const markets = [];
-  
-  markets.push(evaluateMarket('Over 1.5 Gols', combinedOver15, odds.over25)); // Usando over25 odd fallback
-  markets.push(evaluateMarket('Over 2.5 Gols', combinedOver25, odds.over25));
-  markets.push(evaluateMarket('Ambas Marcam', combinedBtts, odds.bttsYes));
-  markets.push(evaluateMarket('Mais de 8.5 Escanteios', combinedCorners, odds.cornersOver85));
-  markets.push(evaluateMarket('Mais de 3.5 Cartões', combinedCards, odds.cardsOver35));
-
-  // Definir o melhor mercado
-  const bestMarket = markets.sort((a, b) => b.score - a.score)[0];
-
+  const len = fixtures.length;
   return {
-    bestMarket: bestMarket.name,
-    confidence: bestMarket.confidence,
-    minOdd: bestMarket.minOdd,
-    reasoning: `As equipes apresentam uma tendência combinada de ${bestMarket.trend} para este mercado. O Time A marca em média ${statsA.avgScored.toFixed(1)} gols e o Time B ${statsB.avgScored.toFixed(1)} gols.`,
-    risks: 'Fatores como desfalques de última hora e condições climáticas não estão totalmente refletidos nesta média.',
-    recommendation: bestMarket.confidence === 'high' ? 'apostar' : (bestMarket.confidence === 'medium' ? 'aguardar escalações' : 'evitar'),
-    stake: bestMarket.confidence === 'high' ? 1.0 : (bestMarket.confidence === 'medium' ? 0.5 : 0.25),
-    markets: markets
+    matches: len,
+    gfAvg: gf / len,
+    gaAvg: ga / len,
+    winRate: wins / len,
+    drawRate: draws / len,
+    lossRate: losses / len,
+    over05htRate: over05ht / len,
+    over15Rate: over15 / len,
+    over25Rate: over25 / len,
+    bttsRate: btts / len,
+    cornersForAvg: cornersFor / len,
+    cornersAgainstAvg: cornersAgainst / len,
+    cornersTotalAvg: (cornersFor + cornersAgainst) / len,
+    cardsForAvg: cardsFor / len,
+    cardsAgainstAvg: cardsAgainst / len,
+    cardsTotalAvg: (cardsFor + cardsAgainst) / len,
+    cornersTotal,
+    cardsTotal
   };
 };
 
-const evaluateMarket = (name, pct, oddStr) => {
-  const odd = parseFloat(oddStr);
-  const impliedProb = odd ? (1 / odd) * 100 : 0;
+const calcProb = (statsA10, statsA5, statsB10, statsB5, h2hStats, metric) => {
+  // Pesos: Recente (30%), Casa/Fora (25%), Stats/Pressão (20%), Contexto (10%), H2H (5%), EV não entra aqui na prob real
+  // Ajustando pra somar 100% da métrica matemática:
+  // 40% Casa/Fora, 40% Last10, 20% H2H
   
-  let confidence = 'low';
-  let desc = 'Evite apostar. Baixa probabilidade estatística.';
-  let score = 0;
+  const w10 = 0.40;
+  const w5 = 0.40;
+  const wH2H = 0.20;
 
-  if (pct >= 75) {
-    confidence = 'high';
-    desc = 'Alta probabilidade baseada nos últimos 10 jogos.';
-    score = 3;
-  } else if (pct >= 55) {
-    confidence = 'medium';
-    desc = 'Probabilidade moderada. Avalie outros fatores.';
-    score = 2;
-  }
+  let val10 = (statsA10[metric] + statsB10[metric]) / 2;
+  let val5 = (statsA5[metric] + statsB5[metric]) / 2;
+  let valH2H = h2hStats ? h2hStats[metric] : val10; // fallback se n houver h2h
 
-  // Se a odd foi inserida, checar se há valor (probabilidade real > probabilidade implícita)
-  if (odd && pct > impliedProb + 5) {
-    score += 1;
-    desc += ' +EV (Esperança Matemática Positiva encontrada na Odd!).';
-  }
+  return (val10 * w10) + (val5 * w5) + (valH2H * wH2H);
+};
 
-  const minOdd = (100 / (pct > 0 ? pct : 1)).toFixed(2);
+export const runAnalysis = (teamsInfo, statsA, statsB, h2hRaw, odds) => {
+  const { teamA, teamB } = teamsInfo;
+
+  const a10 = extractTeamStats(statsA.last10, teamA.id);
+  const a5 = extractTeamStats(statsA.roleSpecific, teamA.id); // Home
+  const b10 = extractTeamStats(statsB.last10, teamB.id);
+  const b5 = extractTeamStats(statsB.roleSpecific, teamB.id); // Away
+  const h2h = extractTeamStats(h2hRaw, teamA.id);
+
+  const markets = [];
+
+  const addMarket = (key, name, trueProb, bookieOdd) => {
+    if (!bookieOdd) return; // Só analisa se o usuário botou a odd
+    
+    const oddCasa = parseFloat(bookieOdd);
+    if (isNaN(oddCasa) || oddCasa <= 1.0) return;
+
+    // Limites lógicos de probabilidade entre 0.05 e 0.95
+    trueProb = Math.max(0.05, Math.min(0.95, trueProb));
+    
+    const fairOdd = 1 / trueProb;
+    const ev = (trueProb * oddCasa) - 1; // Expected Value: (Prob * Lucro) - ((1-Prob) * 1) -> Prob * Odd - 1
+    
+    // EV positivo se EV > 0
+    let confidence = 'low';
+    let stake = 0.25;
+    if (ev > 0.05) { confidence = 'medium'; stake = 0.5; }
+    if (ev > 0.15) { confidence = 'high'; stake = 1; }
+
+    markets.push({
+      key,
+      name,
+      trueProb: trueProb * 100,
+      fairOdd,
+      bookieOdd: oddCasa,
+      ev: ev * 100,
+      confidence,
+      stake,
+      isEVPositive: ev > 0
+    });
+  };
+
+  // 1. OVER 0.5 HT
+  const prob05ht = calcProb(a10, a5, b10, b5, h2h, 'over05htRate');
+  addMarket('over05ht', 'Over 0.5 HT', prob05ht, odds.over05ht);
+
+  // 2. OVER 1.5
+  const prob15 = calcProb(a10, a5, b10, b5, h2h, 'over15Rate');
+  addMarket('over15', 'Over 1.5 Gols', prob15, odds.over15);
+
+  // 3. OVER 2.5
+  const prob25 = calcProb(a10, a5, b10, b5, h2h, 'over25Rate');
+  addMarket('over25', 'Over 2.5 Gols', prob25, odds.over25);
+
+  // 4. BTTS
+  const probBtts = calcProb(a10, a5, b10, b5, h2h, 'bttsRate');
+  addMarket('bttsYes', 'Ambas Marcam', probBtts, odds.bttsYes);
+
+  // 5. Match Odds 1X2
+  // true prob 1:
+  const prob1 = (a10.winRate * 0.4) + (a5.winRate * 0.4) + ((1 - b10.winRate) * 0.1) + ((1 - b5.winRate) * 0.1);
+  addMarket('home', `Vitória ${teamA.name}`, prob1, odds.home);
+
+  const prob2 = (b10.winRate * 0.4) + (b5.winRate * 0.4) + ((1 - a10.winRate) * 0.1) + ((1 - a5.winRate) * 0.1);
+  addMarket('away', `Vitória ${teamB.name}`, prob2, odds.away);
+
+  // Draw prob fallback
+  const probX = 1 - prob1 - prob2;
+  addMarket('draw', 'Empate', probX > 0 ? probX : 0.1, odds.draw);
+
+  // Dupla Chance
+  addMarket('dc1x', 'Dupla Chance 1X', prob1 + probX, odds.dc1x);
+  addMarket('dc12', 'Dupla Chance 12', prob1 + prob2, odds.dc12);
+  addMarket('dcx2', 'Dupla Chance X2', prob2 + probX, odds.dcx2);
+
+  // Escanteios
+  const avgCorners = calcProb(a10, a5, b10, b5, h2h, 'cornersTotalAvg');
+  // Usando distribuição de poisson simples/estimativa linear para calcular prob de passar a linha
+  const probOver85C = avgCorners > 8.5 ? Math.min(0.9, (avgCorners / 8.5) * 0.6) : 0.2;
+  const probOver95C = avgCorners > 9.5 ? Math.min(0.85, (avgCorners / 9.5) * 0.5) : 0.15;
+  const probOver105C = avgCorners > 10.5 ? Math.min(0.8, (avgCorners / 10.5) * 0.4) : 0.1;
+  
+  addMarket('corners85', 'Mais de 8.5 Escanteios', probOver85C, odds.corners85);
+  addMarket('corners95', 'Mais de 9.5 Escanteios', probOver95C, odds.corners95);
+  addMarket('corners105', 'Mais de 10.5 Escanteios', probOver105C, odds.corners105);
+
+  // Cartões
+  const avgCards = calcProb(a10, a5, b10, b5, h2h, 'cardsTotalAvg');
+  const probOver35Cards = avgCards > 3.5 ? Math.min(0.9, (avgCards / 3.5) * 0.6) : 0.3;
+  const probOver45Cards = avgCards > 4.5 ? Math.min(0.85, (avgCards / 4.5) * 0.5) : 0.2;
+
+  addMarket('cards35', 'Mais de 3.5 Cartões', probOver35Cards, odds.cards35);
+  addMarket('cards45', 'Mais de 4.5 Cartões', probOver45Cards, odds.cards45);
+
+  markets.sort((a, b) => b.ev - a.ev);
 
   return {
-    name,
-    confidence,
-    trend: `${pct.toFixed(0)}%`,
-    desc,
-    score,
-    minOdd
+    metrics: {
+      teamA_gf: (a10.gfAvg).toFixed(2),
+      teamA_ga: (a10.gaAvg).toFixed(2),
+      teamB_gf: (b10.gfAvg).toFixed(2),
+      teamB_ga: (b10.gaAvg).toFixed(2),
+      cornersAvg: avgCorners.toFixed(1),
+      cardsAvg: avgCards.toFixed(1)
+    },
+    markets
   };
 };
